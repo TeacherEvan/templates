@@ -1,0 +1,34 @@
+name: validate-templates
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Parse all YAML/JSON/XML
+        run: |
+          python - <<'PY'
+          import glob, sys, json, xml.dom.minidom as M
+          import yaml
+          bad=0
+          for f in glob.glob('**/*.{yml,yaml,json}', recursive=True):
+              try:
+                  (yaml.safe_load if f.endswith(('yml','yaml')) else json.load)(open(f))
+              except Exception as e:
+                  print("FAIL", f, e); bad+=1
+          for f in glob.glob('**/pom.xml', recursive=True):
+              try: M.parse(f)
+              except Exception as e: print("XML FAIL", f, e); bad+=1
+          sys.exit(bad)
+          PY
+      - name: Python package tests
+        working-directory: templates/python-package
+        run: |
+          pip install -e ".[dev]"
+          pytest
