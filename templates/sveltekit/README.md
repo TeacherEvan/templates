@@ -7,7 +7,7 @@ A practical **SvelteKit** starter (Svelte 5 + Vite + TypeScript + Vitest).
 - `+page.svelte` with a `$state` counter demo
 - `+layout.svelte` / `+layout.ts` data wiring
 - Vitest smoke test
-- Strict TypeScript, `adapter-auto`
+- Strict TypeScript, `adapter-static` (Node-portable; configure via `vite.config.ts` if you want a custom static dir)
 
 ## What it is NOT
 

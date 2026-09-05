@@ -1,1 +1,3 @@
-export const title = "SvelteKit Starter";
+export const load = () => {
+  return { title: "SvelteKit Starter" };
+};

@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .venv/
 .env
+
+# Hermes surgical-implementation scratch dir
+docs/.scratch-audit/

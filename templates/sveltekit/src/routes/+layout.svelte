@@ -1,5 +1,11 @@
 <script lang="ts">
-  let { data } = $props();
+  let { data, children } = $props();
 </script>
 
-<h1>Welcome to {data.title}</h1>
+<header>
+  <h1>Welcome to {data.title}</h1>
+</header>
+
+<main>
+  {@render children?.()}
+</main>
