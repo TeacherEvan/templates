@@ -1,4 +1,4 @@
-# python-package
+# python_package
 
 A practical, production-grade Python package starter using **src-layout** and **pytest**.
 
