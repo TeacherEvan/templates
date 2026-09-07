@@ -33,19 +33,9 @@ The root CI (`.github/workflows/validate.yml`) runs:
 - structural checks for the other templates
 
 Run locally before pushing:
+
 ```bash
-python3 - <<'PY'
-import yaml, json, glob, sys, xml.dom.minidom as M
-bad=0
-for f in glob.glob('**/*.{yml,yaml,json}', recursive=True):
-    try:
-        (yaml.safe_load if f.endswith(('yml','yaml')) else json.load)(open(f))
-    except Exception as e:
-        print("PARSE FAIL", f, e); bad+=1
-for f in glob.glob('**/pom.xml', recursive=True):
-    try: M.parse(f)
-    except Exception as e: print("XML FAIL", f, e); bad+=1
-sys.exit(bad)
-PY
-pytest templates/python-package
+bash scripts/verify-templates.sh
 ```
+
+The script mirrors `.github/workflows/validate.yml`: it parses every YAML/JSON/XML file in the repo via `pathlib.Path.rglob`, asserts every template has a `README.md`, scans for accidental secret patterns, and runs `pytest` against `templates/python-package`. Exits non-zero on any failure.

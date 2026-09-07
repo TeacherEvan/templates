@@ -26,6 +26,14 @@ pnpm dev
 
 Each template is self-contained and documented in its own `README.md`.
 
+Before contributing, run the verification recipe:
+
+```bash
+bash scripts/verify-templates.sh
+```
+
+It parses every YAML/JSON/XML config in the repo, checks each template has a `README.md`, scans for accidental secrets, and exercises `templates/python-package`'s `pytest` suite — the same gate CI runs.
+
 ## Principles
 
 - **Runnable over impressive.** Every template's test/build command passes in a clean environment.

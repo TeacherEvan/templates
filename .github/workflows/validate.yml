@@ -1,7 +1,7 @@
 name: validate-templates
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
 jobs:
   validate:
@@ -14,17 +14,27 @@ jobs:
       - name: Parse all YAML/JSON/XML
         run: |
           python - <<'PY'
-          import glob, sys, json, xml.dom.minidom as M
-          import yaml
-          bad=0
-          for f in glob.glob('**/*.{yml,yaml,json}', recursive=True):
+          # Use pathlib.Path.rglob for suffix-based discovery; glob.glob's
+          # brace expansion does not work on Python 3.11, which silently
+          # returns []. See docs/.scratch-audit/CODEBASE-STATE.md (Bug B-1).
+          import sys, json, xml.dom.minidom as M
+          import yaml, pathlib
+          bad = 0
+          configs = [p for p in pathlib.Path('.').rglob('*')
+                     if p.is_file() and p.suffix in ('.yml', '.yaml', '.json')]
+          for f in configs:
               try:
-                  (yaml.safe_load if f.endswith(('yml','yaml')) else json.load)(open(f))
+                  if f.suffix in ('.yml', '.yaml'):
+                      yaml.safe_load(f.read_text())
+                  else:
+                      json.loads(f.read_text())
               except Exception as e:
-                  print("FAIL", f, e); bad+=1
-          for f in glob.glob('**/pom.xml', recursive=True):
-              try: M.parse(f)
-              except Exception as e: print("XML FAIL", f, e); bad+=1
+                  print("FAIL", f, e); bad += 1
+          poms = list(pathlib.Path('.').rglob('pom.xml'))
+          for f in poms:
+              try: M.parseString(f.read_text())
+              except Exception as e: print("XML FAIL", f, e); bad += 1
+          print(f"parsed {len(configs)} YAML/JSON + {len(poms)} pom.xml; failures={bad}")
           sys.exit(bad)
           PY
       - name: Python package tests
