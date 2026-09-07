@@ -20,6 +20,16 @@ to [Semantic Versioning](https://semver.org/).
   secret-pattern scan, `pytest` against `templates/python-package`).
 - `CHANGELOG.md` (this file).
 
+- `.github/workflows/validate.yml`: CI now runs the same secret-pattern
+  scan (`sk_live_`, `pk_live_`, `AKIA`, `ghp_`, `Bearer`) as
+  `scripts/verify-templates.sh`. Local-only enforcement was hiding a CI gap
+  where a leaked key would pass the remote gate. Mirrors the local recipe
+  verbatim so the two stay in sync.
+- `.github/workflows/validate.yml`: removed a stale comment that referenced
+  `docs/.scratch-audit/CODEBASE-STATE.md` — that file is gitignored and never
+  tracked. Comment now reads `Mirrors scripts/verify-templates.sh.`
+
+
 ### Changed
 - `AGENTS.md` "Verification" section now points at `scripts/verify-templates.sh`
   in place of the inline heredoc recipe.

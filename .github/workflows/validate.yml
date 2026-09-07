@@ -16,7 +16,7 @@ jobs:
           python - <<'PY'
           # Use pathlib.Path.rglob for suffix-based discovery; glob.glob's
           # brace expansion does not work on Python 3.11, which silently
-          # returns []. See docs/.scratch-audit/CODEBASE-STATE.md (Bug B-1).
+          # returns []. Mirrors scripts/verify-templates.sh.
           import sys, json, xml.dom.minidom as M
           import yaml, pathlib
           bad = 0
@@ -35,6 +35,43 @@ jobs:
               try: M.parseString(f.read_text())
               except Exception as e: print("XML FAIL", f, e); bad += 1
           print(f"parsed {len(configs)} YAML/JSON + {len(poms)} pom.xml; failures={bad}")
+          sys.exit(bad)
+          PY
+      - name: Secret pattern scan
+        run: |
+          # Mirror scripts/verify-templates.sh: forbid sk_live_, pk_live_, AKIA,
+          # ghp_, and high-entropy Bearer tokens in tracked config + source.
+          # YOUR_* placeholders are allowed.
+          python - <<'PY'
+          import re, sys, pathlib
+          patterns = [
+              r'sk_live_[A-Za-z0-9]{8,}',
+              r'pk_live_[A-Za-z0-9]{8,}',
+              r'AKIA[0-9A-Z]{16}',
+              r'ghp_[A-Za-z0-9]{30,}',
+              r'Bearer\s+[A-Za-z0-9._-]{16,}',
+          ]
+          suffixes = {'.md', '.yml', '.yaml', '.json', '.ts', '.tsx',
+                      '.js', '.svelte', '.py', '.java', '.xml'}
+          roots = ['templates', 'scripts', '.github', 'AGENTS.md', 'README.md']
+          rx = re.compile('|'.join(patterns))
+          bad = 0
+          for root in roots:
+              rp = pathlib.Path(root)
+              files = [rp] if rp.is_file() else sorted(rp.rglob('*'))
+              for f in files:
+                  if not f.is_file() or f.suffix not in suffixes:
+                      continue
+                  try:
+                      text = f.read_text()
+                  except Exception:
+                      continue
+                  if 'YOUR_' in text:
+                      text = re.sub(r'YOUR_[A-Za-z0-9_]+', '', text)
+                  for m in rx.finditer(text):
+                      print(f"FAIL {f}: matched {m.group(0)!r}")
+                      bad += 1
+          print(f"secret-pattern scan: failures={bad}")
           sys.exit(bad)
           PY
       - name: Python package tests
