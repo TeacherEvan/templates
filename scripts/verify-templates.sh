@@ -51,6 +51,7 @@ echo
 echo "=== secret-pattern scan (sk_live_, pk_live_, AKIA, ghp_, Bearer) ==="
 # Allow YOUR_* placeholders. Read .gitignore too (node_modules etc.) via ripgrep --no-ignore is undesirable.
 hits=$(grep -rIE \
+    --exclude-dir=node_modules --exclude-dir=target --exclude-dir=dist --exclude-dir=.svelte-kit \
     --include='*.md' --include='*.yml' --include='*.yaml' --include='*.json' \
     --include='*.ts' --include='*.tsx' --include='*.js' --include='*.svelte' \
     --include='*.py' --include='*.java' --include='*.xml' \
@@ -70,6 +71,46 @@ echo "secret-pattern scan: 0 hits"
 echo
 echo "=== python-package pytest ==="
 ( cd templates/python-package && python3 -m pip install -e ".[dev]" >/dev/null && python3 -m pytest -q )
+
+echo
+echo "=== sveltekit smoke test (npm install + vitest) ==="
+if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+    ( cd templates/sveltekit && npm install --no-audit --no-fund >/dev/null && npm run test )
+    echo "sveltekit: passed"
+else
+    echo "SKIP: node/npm not available on PATH"
+fi
+
+echo
+echo "=== nextjs-convex smoke test (npm install) ==="
+if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then
+    # nextjs-convex has no `test` script and `npm run typecheck` depends on the
+    # Convex codegen output (`convex/_generated/*`), which is produced by
+    # `npx convex dev` / `npx convex codegen` after the user wires up a
+    # deployment per the template's README. We therefore only assert that
+    # dependencies resolve + install (proves package.json is well-formed and
+    # reachable). Run typecheck locally after `npx convex dev` first.
+    ( cd templates/nextjs-convex && npm install --no-audit --no-fund >/dev/null )
+    echo "nextjs-convex: passed (deps install; typecheck requires npx convex dev)"
+else
+    echo "SKIP: node/npm not available on PATH"
+fi
+
+echo
+echo "=== spring-boot-api smoke test (mvn test) ==="
+if command -v mvn >/dev/null 2>&1 && command -v java >/dev/null 2>&1; then
+    # Pin JAVA_HOME to the JDK backing `which java`. On some systems (notably
+    # Ubuntu 24.04 with Maven 3.8.7) the Surefire forked JVM silently picks up
+    # a different Java than Maven's compile JVM, producing class-file version
+    # mismatches even though no other JDK is on PATH. Forcing JAVA_HOME here
+    # keeps compile + test JVMs in sync. CI uses actions/setup-java@v4 which
+    # already sets this correctly.
+    _java_home="$(dirname "$(dirname "$(readlink -f "$(command -v java)")")")"
+    ( cd templates/spring-boot-api && JAVA_HOME="$_java_home" mvn -q test )
+    echo "spring-boot-api: passed"
+else
+    echo "SKIP: mvn/java not available on PATH"
+fi
 
 echo
 echo "ALL CHECKS PASSED"

@@ -51,6 +51,10 @@ jobs:
               r'ghp_[A-Za-z0-9]{30,}',
               r'Bearer\s+[A-Za-z0-9._-]{16,}',
           ]
+          # Exclude dependency + build output directories so the scan only
+          # covers source/config (a base64 blob in node_modules would otherwise
+          # match the Bearer pattern).
+          skip_dirs = {'node_modules', 'target', 'dist', '.svelte-kit', '.next', '.git'}
           suffixes = {'.md', '.yml', '.yaml', '.json', '.ts', '.tsx',
                       '.js', '.svelte', '.py', '.java', '.xml'}
           roots = ['templates', 'scripts', '.github', 'AGENTS.md', 'README.md']
@@ -61,6 +65,8 @@ jobs:
               files = [rp] if rp.is_file() else sorted(rp.rglob('*'))
               for f in files:
                   if not f.is_file() or f.suffix not in suffixes:
+                      continue
+                  if any(part in skip_dirs for part in f.parts):
                       continue
                   try:
                       text = f.read_text()
@@ -79,3 +85,28 @@ jobs:
         run: |
           pip install -e ".[dev]"
           pytest
+      - name: Setup Node toolchain (for JS templates)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: SvelteKit smoke test (npm install + vitest)
+        working-directory: templates/sveltekit
+        run: |
+          npm install --no-audit --no-fund
+          npm run test
+      - name: Next.js + Convex smoke test (npm install)
+        working-directory: templates/nextjs-convex
+        # `npm run typecheck` depends on Convex codegen output produced by
+        # `npx convex dev` / `npx convex codegen` after the user wires up a
+        # deployment per the template's README. We therefore only assert that
+        # dependencies resolve + install.
+        run: npm install --no-audit --no-fund
+      - name: Setup Java toolchain (for Spring Boot template)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Spring Boot API smoke test (mvn test)
+        working-directory: templates/spring-boot-api
+        run: mvn -q test
