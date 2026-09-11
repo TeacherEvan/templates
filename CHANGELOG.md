@@ -7,6 +7,7 @@ to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 
 ### Fixed
+- `sveltekit` template: add missing `src/app.html` so `npm run build` passes out of the box (the file is required by SvelteKit and was previously absent, breaking the documented build command).
 - `scripts/verify-templates.sh`: pin `JAVA_HOME` to the JDK backing `which java`
   before invoking `mvn test` for `templates/spring-boot-api`. Without this,
   Maven 3.8.7's Surefire forked JVM silently picks up a different Java than

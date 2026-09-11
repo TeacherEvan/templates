@@ -17,6 +17,7 @@ A practical **SvelteKit** starter (Svelte 5 + Vite + TypeScript + Vitest).
 ## Prerequisites
 
 - Node 20+
+- `src/app.html` is required by SvelteKit (it is included in this template).
 
 ## Run it
 
