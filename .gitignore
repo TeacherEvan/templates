@@ -6,3 +6,6 @@ __pycache__/
 
 # Hermes surgical-implementation scratch dir
 docs/.scratch-audit/
+
+# npm lockfiles generated during template verification (not template content)
+templates/*/package-lock.json
