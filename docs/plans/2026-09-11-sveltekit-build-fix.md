@@ -1,6 +1,6 @@
 # Plan: sveltekit build fix
 
-Status: proposed
+Status: DONE — verified 2026-09-12
 Generated: 2026-09-11T13:20:00+07:00
 
 ## Objective
@@ -21,13 +21,13 @@ change.
 
 ## Objectives
 
-- [ ] OBJ-001: Add `templates/sveltekit/src/app.html` (minimal SvelteKit shell).
-- [ ] OBJ-002: Run `npm run build` in `templates/sveltekit`; assert exit 0.
-- [ ] OBJ-003: Update `templates/sveltekit/README.md` to note `src/app.html` is
+- [x] OBJ-001: Add `templates/sveltekit/src/app.html` (minimal SvelteKit shell).
+- [x] OBJ-002: Run `npm run build` in `templates/sveltekit`; assert exit 0.
+- [x] OBJ-003: Update `templates/sveltekit/README.md` to note `src/app.html` is
   required (SvelteKit convention) so the build is self-documenting.
-- [ ] OBJ-004: Update root `CHANGELOG.md` `[Unreleased]` with the fix entry.
-- [ ] OBJ-005: Run `bash scripts/verify-templates.sh`; assert exit 0.
-- [ ] OBJ-006: Commit the change on `master` and push to `origin`.
+- [x] OBJ-004: Update root `CHANGELOG.md` `[Unreleased]` with the fix entry.
+- [x] OBJ-005: Run `bash scripts/verify-templates.sh`; assert exit 0.
+- [x] OBJ-006: Commit the change on `master` and push to `origin`.
 
 ## Verification
 
