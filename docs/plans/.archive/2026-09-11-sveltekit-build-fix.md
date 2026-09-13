@@ -35,3 +35,14 @@ change.
 cd templates/sveltekit && npm run build
 bash scripts/verify-templates.sh
 ```
+
+---
+
+## Resolution note (2026-09-13)
+
+Archived after surgical-implementation plan scan. All six objectives were already
+verified on the live tree (`3ec2dcf`): `src/app.html` present, `npm run build`
+exit 0, README documents the file, CHANGELOG records the fix, and
+`scripts/verify-templates.sh` returns `ALL CHECKS PASSED`. No new work required.
+The plan and its debrief are moved to `.archive/` so the dispatcher no longer
+re-derives finished work.

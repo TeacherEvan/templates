@@ -9,7 +9,7 @@ COMPLETE — plan already implemented and verified; no new work required.
 - `bash scripts/verify-templates.sh` -> `ALL CHECKS PASSED`, exit 0 (sveltekit vitest, nextjs-convex deps, spring-boot-api mvn test, secret scan, structural checks).
 - README line 20 documents `src/app.html` as required.
 - CHANGELOG `[Unreleased] > Fixed` records the entry.
-- Commit `9221e13` on `master` already pushed to `origin`.
+- Commit `3ec2dcf` on `master` already pushed to `origin`.
 
 ## Code review (5 axes)
 - **Correctness:** app.html is the canonical SvelteKit shell; build produces valid static output.
@@ -23,4 +23,4 @@ COMPLETE — plan already implemented and verified; no new work required.
 None.
 
 ## Push status
-Already pushed (commit 9221e13 on master). No new push required.
+Already pushed (commit 3ec2dcf on master). No new push required.
